@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/scheduler
+    username: scheduler
+    password: scheduler
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org.quartz.scheduler.instanceName: scheduler-cluster
+      org.quartz.scheduler.instanceId: AUTO
+
+      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
+      org.quartz.jobStore.isClustered: true
+      org.quartz.jobStore.clusterCheckinInterval: 10000
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+      org.quartz.jobStore.useProperties: false
+      org.quartz.jobStore.tablePrefix: QRTZ_
+      org.quartz.jobStore.dataSource: quartzDataSource
+
+      org.quartz.threadPool.threadCount: 10
+
+      org.quartz.dataSource.quartzDataSource.provider: hikaricp
+      org.quartz.dataSource.quartzDataSource.driver: org.postgresql.Driver
+      org.quartz.dataSource.quartzDataSource.URL: jdbc:postgresql://localhost:5432/scheduler
+      org.quartz.dataSource.quartzDataSource.user: scheduler
+      org.quartz.dataSource.quartzDataSource.password: scheduler
+      org.quartz.dataSource.quartzDataSource.maxConnections: 5
