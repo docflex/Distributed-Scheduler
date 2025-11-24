@@ -1,8 +1,235 @@
 {
   "info": {
-    "_postman_id": "69618d51-2e77-4703-9766-2c266f375c9f",
-    "name": "New Collection",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "_postman_id": "24e80030-e673-461e-9fdc-1859362eee2c",
+    "name": "Distributed Scheduler GraphQL API",
+    "description": "Postman Collection for GraphQL endpoints of the Distributed Scheduler",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "28676303"
   },
-  "item": []
+  "item": [
+    {
+      "name": "Create Job",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"mutation CreateJob($input: CreateJobInput!) { createJob(input: $input) { id name scheduleType status } }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"Extract Number One\",\n      \"scheduleType\": \"CRON\",\n      \"cronExpression\": \"0/10 * * * * ?\",\n      \"payload\": {\n        \"type\": \"N/A\"\n      }\n    }\n  }\n}\n"
+        },
+        "url": {
+          "raw": "http://localhost:8080/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Jobs",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"{ jobs { id name scheduleType status } }\"\n}\n"
+        },
+        "url": {
+          "raw": "http://localhost:8080/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Job By ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query($id: ID!) { job(id: $id) { id name status scheduleType } }\",\n  \"variables\": { \"id\": \"fdbea74b-2230-4690-8f38-5f06db15e205\" }\n}\n"
+        },
+        "url": {
+          "raw": "http://localhost:8080/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Pause Job By ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"mutation($id: ID!) { pauseJob(id: $id) { id name status } }\",\n  \"variables\": { \"id\": \"e43d198c-7dba-48d4-abb1-138f19d51ca8\" }\n}\n"
+        },
+        "url": {
+          "raw": "http://localhost:8080/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Resume Job By ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"mutation($id: ID!) { resumeJob(id: $id) { id name status } }\",\n  \"variables\": { \"id\": \"fdbea74b-2230-4690-8f38-5f06db15e205\" }\n}\n"
+        },
+        "url": {
+          "raw": "http://localhost:8080/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Run Job Now",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"mutation($id: ID!) { runJobNow(id: $id) }\",\n  \"variables\": { \"id\": \"e43d198c-7dba-48d4-abb1-138f19d51ca8\" }\n}\n"
+        },
+        "url": {
+          "raw": "http://localhost:8080/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Job Logs",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query($id: ID!) { jobLogs(jobId: $id) { id fireTime status errorMessage } }\",\n  \"variables\": { \"id\": \"e43d198c-7dba-48d4-abb1-138f19d51ca8\" }\n}\n"
+        },
+        "url": {
+          "raw": "http://localhost:8080/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Job By ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"mutation($id: ID!) { deleteJob(id: $id) }\",\n  \"variables\": { \"id\": \"143bd991-dd72-4886-a0c4-552d0646d0b0\" }\n}\n"
+        },
+        "url": {
+          "raw": "http://localhost:8080/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
 }
