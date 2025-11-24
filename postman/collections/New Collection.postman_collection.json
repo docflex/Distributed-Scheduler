@@ -3,12 +3,12 @@
     "_postman_id": "24e80030-e673-461e-9fdc-1859362eee2c",
     "name": "Distributed Scheduler GraphQL API",
     "description": "Postman Collection for GraphQL endpoints of the Distributed Scheduler",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "28676303"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
       "name": "Create Job",
+      "id": "74252136-fe3c-410e-b97d-640f9617e780",
       "request": {
         "method": "POST",
         "header": [
@@ -32,11 +32,11 @@
             "graphql"
           ]
         }
-      },
-      "response": []
+      }
     },
     {
       "name": "List Jobs",
+      "id": "4b930209-a765-4c74-9d1a-b31054acf35a",
       "request": {
         "method": "POST",
         "header": [
@@ -60,11 +60,11 @@
             "graphql"
           ]
         }
-      },
-      "response": []
+      }
     },
     {
       "name": "Get Job By ID",
+      "id": "70a9d681-376e-474b-926c-c88e397f9d9e",
       "request": {
         "method": "POST",
         "header": [
@@ -88,11 +88,11 @@
             "graphql"
           ]
         }
-      },
-      "response": []
+      }
     },
     {
       "name": "Pause Job By ID",
+      "id": "d8fc5031-6dff-4558-af9a-fbedaabd1f89",
       "request": {
         "method": "POST",
         "header": [
@@ -116,11 +116,11 @@
             "graphql"
           ]
         }
-      },
-      "response": []
+      }
     },
     {
       "name": "Resume Job By ID",
+      "id": "d44aaf07-857d-4af3-85c2-742e914ea541",
       "request": {
         "method": "POST",
         "header": [
@@ -144,11 +144,11 @@
             "graphql"
           ]
         }
-      },
-      "response": []
+      }
     },
     {
       "name": "Run Job Now",
+      "id": "004b8f43-3154-412a-95d8-af318af9f378",
       "request": {
         "method": "POST",
         "header": [
@@ -172,11 +172,11 @@
             "graphql"
           ]
         }
-      },
-      "response": []
+      }
     },
     {
       "name": "Get Job Logs",
+      "id": "ffc9656c-5ea8-4867-b7d8-0588035ae6c2",
       "request": {
         "method": "POST",
         "header": [
@@ -200,11 +200,11 @@
             "graphql"
           ]
         }
-      },
-      "response": []
+      }
     },
     {
       "name": "Delete Job By ID",
+      "id": "f08b71f9-70a9-405c-8732-ca0d91d13793",
       "request": {
         "method": "POST",
         "header": [
@@ -228,8 +228,7 @@
             "graphql"
           ]
         }
-      },
-      "response": []
+      }
     }
   ]
 }
