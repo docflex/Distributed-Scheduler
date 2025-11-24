@@ -410,7 +410,7 @@ Check logs:
 SELECT * FROM job_execution_log ORDER BY fire_time DESC;
 ```
 
-### Test via GraphQL
+### Test via GraphQL (POSTman)
 
 Open:
 
@@ -420,19 +420,21 @@ http://localhost:8080/graphql
 
 Example mutation:
 
-```graphql
-mutation {
-  createJob(input: {
-    name: "Test Job"
-    scheduleType: "CRON"
-    cronExpression: "0/10 * * * * ?"
-    payload: { "type": "demo" }
-  }) {
-    id
-    name
-    status
+```json
+{
+  "query": "mutation CreateJob($input: CreateJobInput!) { createJob(input: $input) { id name scheduleType status } }",
+  "variables": {
+    "input": {
+      "name": "Sample cron job",
+      "scheduleType": "CRON",
+      "cronExpression": "0/1 * * * * ?",
+      "payload": {
+        "type": "2nd Tester"
+      }
+    }
   }
 }
+
 ```
 
 # License
