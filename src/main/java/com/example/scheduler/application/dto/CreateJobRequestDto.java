@@ -12,6 +12,9 @@ import java.util.Map;
 public class CreateJobRequestDto {
     private String name;
     private String description;
-    private TriggerConfigDto trigger;
+    private String scheduleType;      // CRON / FIXED_RATE / FIXED_DELAY
+    private String cronExpression;    // for CRON
+    private Long intervalSeconds;     // for FIXED_RATE or FIXED_DELAY
+    private Long initialDelaySeconds; // for FIXED_DELAY
     private Map<String, Object> payload; // will be JSON-serialized
 }

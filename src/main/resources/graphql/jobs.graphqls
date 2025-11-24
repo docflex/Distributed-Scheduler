@@ -1,0 +1,78 @@
+scalar JSON
+
+"""Job schedule type, must match your Java enum names"""
+enum JobScheduleType {
+    CRON
+    FIXED_RATE
+    FIXED_DELAY
+}
+
+"""Job status, must match your Java JobStatus enum"""
+enum JobStatus {
+    ACTIVE
+    PAUSED
+    DELETED
+}
+
+"""Single scheduled job"""
+type Job {
+    id: ID!
+    name: String!
+    scheduleType: JobScheduleType!
+    cronExpression: String
+    intervalSeconds: Int
+    initialDelaySeconds: Int
+    payload: String
+    status: JobStatus!
+    version: Int!
+    createdAt: String
+    updatedAt: String
+}
+
+"""Single execution of a job"""
+type JobExecutionLog {
+    id: ID!
+    jobId: ID!
+    fireTime: String!
+    status: String!
+    errorMessage: String
+    createdAt: String!
+}
+
+"""Input for creating a job"""
+input CreateJobInput {
+    name: String!
+    scheduleType: JobScheduleType!
+    cronExpression: String
+    intervalSeconds: Int
+    initialDelaySeconds: Int
+    payload: JSON
+}
+
+type Query {
+    """List all jobs"""
+    jobs: [Job!]!
+
+    """Get a single job by id"""
+    job(id: ID!): Job
+
+    """Get execution logs for a job"""
+    jobLogs(jobId: ID!): [JobExecutionLog!]!
+}
+
+type Mutation {
+    """Create and schedule a job"""
+    createJob(input: CreateJobInput!): Job!
+
+    """Pause a job (domain + Quartz)"""
+    pauseJob(id: ID!): Job!
+
+    """Resume a job"""
+    resumeJob(id: ID!): Job!
+
+    """Delete a job and unschedule it"""
+    deleteJob(id: ID!): Boolean!
+
+    """Fire a job immediately on the cluster"""
+    runJobNow(id: ID!): Boolean!
+}

@@ -22,27 +22,43 @@ public class JobMapper {
     }
 
     public JobDefinition toDomain(CreateJobRequestDto dto) {
-        String payloadJson;
-        try {
-            payloadJson = dto.getPayload() == null ? null : objectMapper.writeValueAsString(dto.getPayload());
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Invalid payload JSON", e);
+        if (dto.getScheduleType() == null) {
+            throw new IllegalArgumentException("Schedule type is required.");
         }
 
-        TriggerConfigDto t = dto.getTrigger();
-        ScheduleType type = ScheduleType.valueOf(t.getType().name());
+        ScheduleType type = ScheduleType.valueOf(dto.getScheduleType());
 
         String cron = null;
         Long interval = null;
         Long initialDelay = null;
 
         switch (type) {
-            case CRON -> cron = t.getCronExpression();
-            case FIXED_RATE -> interval = t.getIntervalSeconds();
-            case FIXED_DELAY -> {
-                interval = t.getIntervalSeconds();
-                initialDelay = t.getInitialDelaySeconds();
+            case CRON -> {
+                if (dto.getCronExpression() == null) {
+                    throw new IllegalArgumentException("Cron expression required for CRON.");
+                }
+                cron = dto.getCronExpression();
             }
+            case FIXED_RATE -> {
+                if (dto.getIntervalSeconds() == null) {
+                    throw new IllegalArgumentException("intervalSeconds required for FIXED_RATE.");
+                }
+                interval = dto.getIntervalSeconds();
+            }
+            case FIXED_DELAY -> {
+                if (dto.getIntervalSeconds() == null) {
+                    throw new IllegalArgumentException("intervalSeconds required for FIXED_DELAY.");
+                }
+                interval = dto.getIntervalSeconds();
+                initialDelay = dto.getInitialDelaySeconds();
+            }
+        }
+
+        String payloadJson;
+        try {
+            payloadJson = dto.getPayload() == null ? null : objectMapper.writeValueAsString(dto.getPayload());
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Invalid payload JSON", e);
         }
 
         Instant now = Instant.now();
