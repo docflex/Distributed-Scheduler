@@ -51,98 +51,240 @@ We need a solution that ensures:
 
 ---
 
+#  **Why Not @Scheduled? (Problem Statement)**
+
+Typical Spring in-memory schedulers:
+
+❌ Run on *every* node
+❌ No persistence (lost jobs on restart)
+❌ Cannot dynamically create/update/remove jobs
+❌ No execution logs
+❌ Fail in distributed systems (double-execution, race conditions)
+
+**Goal:**
+
+### ✔ Ensure exactly-once job execution across a cluster
+
+### ✔ Persist job metadata + execution logs
+
+### ✔ Provide API-driven dynamic job scheduling
+
+### ✔ Recover safely after crashes (reconciliation)
+
+### ✔ Stay cloud-friendly, horizontally scalable
+
+---
+
+---
+
 # Architecture Overview
 
 ```
-            +----------------------------+
-            |     REST API (Future)      |
-            +----------------------------+
-                        |
-                        v
-        +-------------------------------------+
-        |   Application Services (Use Cases)  |
-        +-------------------------------------+
-                        |
-                        v
-        +-------------------+   +-------------------+
-        | JobDefinitionRepo |   |  JobSchedulerPort |
-        +-------------------+   +-------------------+
-                 |                     |
-                 v                     v
-+------------------------------+    +------------------------------+
-|  PostgreSQL (job metadata)   |    | Quartz (clustered scheduler) |
-+------------------------------+    +------------------------------+
+                      +------------------------+
+                      |   GraphQL API Layer    |
+                      +-----------+------------+
+                                  |
+                                  v
+               +---------------------------------------+
+               |     Application Services (Use Cases)   |
+               +--------------------+-------------------+
+                                   |
+      +----------------------------+-----------------------------+
+      |                                                          |
+      v                                                          v
++------------------------+                       +-----------------------------+
+| JobDefinitionRepoPort  |     Domain Ports      |   JobSchedulerPort          |
++------------------------+                       +-----------------------------+
+      |                                                          |
+      v                                                          v
++------------------------------+             +--------------------------------+
+| PostgreSQL (job metadata)    |             | Quartz Scheduler (clustered)   |
++------------------------------+             +--------------------------------+
 ```
 
----
+# 📦 **Implementation Phases**
 
-# Implementation Phases
-
-This project is being built in **4 major phases**.
-
-## **Phase 1 — Quartz Clustering (Completed ✓)**
-
-Goal: Ensure **multiple instances behave as one scheduler**.
-
-Accomplished:
-
-* PostgreSQL Quartz schema applied via **Flyway**
-* Quartz configured with:
-
-    * `JobStoreTX`
-    * `isClustered=true`
-    * heartbeat / misfire settings
-* Multiple instances tested (1 → many)
-* Cluster test job verified **only one node executes**
+The project follows a structured 4-phase roadmap.
 
 ---
 
-## **Phase 2 — Domain Model + Job Persistence (In Progress ✓)**
+# **Phase 1 — Quartz Clustering (✓ Completed)**
 
-### Completed:
+**Objective:** Multi-instance Quartz running as ONE logical scheduler.
 
-✔ Created `job_definition` & `job_execution_log` tables
-✔ Implemented domain models
-✔ Implemented JPA entities + repositories
-✔ Added `JobSchedulingService` orchestrating:
+Completed:
 
-* persist job
-* schedule job
-  ✔ Added execution logging inside `QuartzJobExecutor`
-  ✔ Added CommandLineRunner to test creation
-  ✔ Reconciliation mechanism added (and debugged)
-  ✔ Multi-instance job creation and execution verified end-to-end
-
-### Current State:
-
-The system now supports:
-
-* Creating new jobs
-* Persisting them in DB
-* Scheduling them in Quartz
-* Running them cluster-safely
-* Logging executions to DB
+✔ Quartz configured with PostgreSQL (`JobStoreTX`)
+✔ Full Flyway-managed Quartz schema
+✔ Clustering enabled (`isClustered = true`)
+✔ Heartbeats & failover handling
+✔ Multi-instance test: **Only one node executes each job**
+✔ Verified DB-based locking & election
 
 ---
 
-## **Phase 3 — API Layer (Coming Next)**
+# **Phase 2 — Domain Model & Persistence Layer (✓ Completed)**
 
-We will build REST endpoints:
+### ✔ Database
 
-### **Job Management APIs**
+Tables created via Flyway:
 
-* `POST /jobs` — create job
-* `PUT /jobs/{id}` — update job
-* `DELETE /jobs/{id}` — delete job
-* `POST /jobs/{id}/pause`
-* `POST /jobs/{id}/resume`
-* `POST /jobs/{id}/run-now`
+* `job_definition`
+* `job_execution_log`
 
-### **Query APIs**
+### ✔ Domain
 
-* `GET /jobs`
-* `GET /jobs/{id}`
-* `GET /jobs/{id}/logs`
+* DDD JobDefinition model
+* ExecutionLog model
+* Schedule types (CRON, FIXED_RATE, FIXED_DELAY)
+* Status lifecycle (ACTIVE, PAUSED, DELETED)
+
+### ✔ Persistence Layer
+
+* JPA entities
+* Repository adapters implementing domain ports
+
+### ✔ Quartz Scheduling Integration
+
+* QuartzSchedulingAdapter bridging domain → Quartz
+* Supports all schedule types
+* Execution logged each time a job fires
+
+### ✔ Reconciliation (Startup Repair)
+
+On startup, Quartz:
+
+* Retrieves persisted ACTIVE jobs
+* Rebuilds triggers
+* Re-schedules missing jobs
+* Prevents duplicate scheduling
+
+### ✔ End-to-End Complete
+
+* Job created → persisted → scheduled → executed → logged
+* Multi-node cluster test validated
+
+---
+
+# **Phase 3 — API Layer (GraphQL) (✓ Completed)**
+
+We now expose full job lifecycle management via GraphQL.
+
+### Supported Mutations
+
+✔ `createJob`
+✔ `pauseJob`
+✔ `resumeJob`
+✔ `deleteJob`
+✔ `runJobNow`
+
+### Supported Queries
+
+✔ `jobs`
+✔ `job(id)`
+✔ `jobLogs(jobId)`
+
+### Input Types
+
+* Flat fields (no nested trigger object)
+* Supports cron or interval-based scheduling
+* JSON payload via `graphql-java-extended-scalars`
+
+---
+
+# **Phase 4 — Dashboard UI (Future)**
+
+Planned features:
+
+* Job list with status, schedule, next fire time
+* Execution logs viewer
+* Node status monitor
+* Job creation/update forms
+* Run-now, pause/resume, delete controls
+
+Likely built in React or Vaadin.
+
+---
+
+# ✔ **What Has Been Delivered**
+
+### Foundation
+
+* Spring Boot 3
+* Hexagonal architecture
+* PostgreSQL + Hikari
+* Flyway migrations
+
+### Scheduler Engine
+
+* Quartz in cluster mode
+* Verified distributed locking
+* Trigger persistence
+* Misfire handling
+
+### Domain & Persistence
+
+* Clean domain model
+* Entities + repositories
+* Versioning ready
+* JSON payload support
+
+### Application Services
+
+* Create / Pause / Resume / Delete / RunNow
+* Full orchestration between DB + Quartz
+* Execution logging
+
+### GraphQL API
+
+* Complete GraphQL schema
+* Scalars (JSON)
+* DTOs + Controllers
+* Typed responses
+* Error handling
+
+### Reconciliation
+
+* Ensures scheduler recovers on restart
+* Matches DB state with Quartz state
+* Prevents orphan triggers
+
+### Cluster Testing
+
+* Multiple JVMs running simultaneously
+* Verified exactly-once execution
+
+---
+
+# 🚀 **Next Steps**
+
+### 1. REST API (optional)
+
+* Mirror GraphQL endpoints for REST consumers
+
+### 2. Updating & Versioning Jobs
+
+* Schedule update
+* Version increment
+* Soft delete lifecycle
+
+### 3. Stronger Reconciliation Logic
+
+* Delete orphaned triggers
+* Rebuild missing definitions
+
+### 4. Observability Enhancements
+
+* Structured logging (jobId, duration, node)
+* Next fire time in responses
+* Node metrics
+
+### 5. UI Dashboard (Phase 4)
+
+* Real-time job status
+* Logs streaming
+* Node list
+* Trigger previews
 
 ### **Validation**
 
@@ -268,7 +410,30 @@ Check logs:
 SELECT * FROM job_execution_log ORDER BY fire_time DESC;
 ```
 
----
+### Test via GraphQL
+
+Open:
+
+```
+http://localhost:8080/graphql
+```
+
+Example mutation:
+
+```graphql
+mutation {
+  createJob(input: {
+    name: "Test Job"
+    scheduleType: "CRON"
+    cronExpression: "0/10 * * * * ?"
+    payload: { "type": "demo" }
+  }) {
+    id
+    name
+    status
+  }
+}
+```
 
 # License
 
