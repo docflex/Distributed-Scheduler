@@ -2,7 +2,7 @@
 
 A production-ready, cloud-native distributed scheduling system built with **Spring Boot 3**, **Quartz**, and **PostgreSQL**.
 
-## 🎯 Overview
+## Overview
 
 This project implements a **Distributed, Multi-Node, Database-Backed Scheduler** that solves the core problem of running scheduled tasks reliably across multiple instances in a distributed system.
 
