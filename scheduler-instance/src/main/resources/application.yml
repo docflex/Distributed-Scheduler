@@ -1,6 +1,13 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /scheduler-instance
+
 spring:
+  application:
+    name: scheduler-instance
   datasource:
-    url: jdbc:postgresql://localhost:5432/scheduler
+    url: jdbc:postgresql://postgres:5432/scheduler
     username: scheduler
     password: scheduler
     driver-class-name: org.postgresql.Driver
@@ -37,7 +44,16 @@ spring:
 
       org.quartz.dataSource.quartzDataSource.provider: hikaricp
       org.quartz.dataSource.quartzDataSource.driver: org.postgresql.Driver
-      org.quartz.dataSource.quartzDataSource.URL: jdbc:postgresql://localhost:5432/scheduler
+      org.quartz.dataSource.quartzDataSource.URL: jdbc:postgresql://postgres:5432/scheduler
       org.quartz.dataSource.quartzDataSource.user: scheduler
       org.quartz.dataSource.quartzDataSource.password: scheduler
       org.quartz.dataSource.quartzDataSource.maxConnections: 5
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:8761/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+  instance:
+    preferIpAddress: true

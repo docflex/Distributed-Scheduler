@@ -1,0 +1,102 @@
+networks:
+  distributed_scheduler:
+    driver: bridge
+
+services:
+
+  # --------------------------------------------------------------
+  # Eureka Server
+  # --------------------------------------------------------------
+  eureka:
+    build: ./infra/eureka
+    container_name: eureka_client_discovery
+    ports:
+      - "8761:8761"
+    networks:
+      - distributed_scheduler
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # --------------------------------------------------------------
+  # Scheduler Instance
+  # --------------------------------------------------------------
+  scheduler-instance:
+    build: ./scheduler-instance
+    ports:
+      - "8081"
+    networks:
+      - distributed_scheduler
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      eureka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # --------------------------------------------------------------
+  # NGINX Load Balancer
+  # --------------------------------------------------------------
+  nginx:
+    build: ./infra/nginx
+    container_name: nginx_load_balancer
+    ports:
+      - "80:80"
+    networks:
+      - distributed_scheduler
+    volumes:
+      - ./infra/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      eureka:
+        condition: service_healthy
+
+
+  # --------------------------------------------------------------
+  # Eureka → NGINX Reconciler
+  # --------------------------------------------------------------
+  eureka2nginx:
+    build: ./infra/eureka2nginx
+    environment:
+      - EUREKA_SERVER_URL=http://eureka:8761/eureka/apps/
+      - POLL_INTERVAL=10
+    volumes:
+      - ./infra/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - nginx
+      - eureka
+    networks:
+      - distributed_scheduler
+
+
+  # --------------------------------------------------------------
+  # Postgres Database for Quartz
+  # --------------------------------------------------------------
+  postgres:
+    image: postgres:14.7
+    container_name: quartz_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: scheduler
+      POSTGRES_PASSWORD: scheduler
+      POSTGRES_DB: scheduler
+    ports:
+      - "5432:5432"
+    volumes:
+      - quartz_pgdata:/var/lib/postgresql/data
+    networks:
+      - distributed_scheduler
+
+
+volumes:
+  quartz_pgdata:
