@@ -1,14 +1,14 @@
 {
   "info": {
-    "_postman_id": "24e80030-e673-461e-9fdc-1859362eee2c",
+    "_postman_id": "41184c46-1af3-4b71-a20e-0f3d03ec9e58",
     "name": "Distributed Scheduler GraphQL API",
     "description": "Postman Collection for GraphQL endpoints of the Distributed Scheduler",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "28676303"
   },
   "item": [
     {
       "name": "Create Job",
-      "id": "74252136-fe3c-410e-b97d-640f9617e780",
       "request": {
         "method": "POST",
         "header": [
@@ -22,21 +22,37 @@
           "raw": "{\n  \"query\": \"mutation CreateJob($input: CreateJobInput!) { createJob(input: $input) { id name scheduleType status } }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"Extract Number One\",\n      \"scheduleType\": \"CRON\",\n      \"cronExpression\": \"0/10 * * * * ?\",\n      \"payload\": {\n        \"type\": \"N/A\"\n      }\n    }\n  }\n}\n"
         },
         "url": {
-          "raw": "http://localhost:8080/graphql",
-          "protocol": "http",
+          "raw": "{{baseURL}}/graphql",
           "host": [
-            "localhost"
+            "{{baseURL}}"
           ],
-          "port": "8080",
           "path": [
             "graphql"
           ]
         }
-      }
+      },
+      "response": []
     },
     {
       "name": "List Jobs",
-      "id": "4b930209-a765-4c74-9d1a-b31054acf35a",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let jobs = pm.response.json().data.jobs;",
+              "let ids = jobs.map(j => j.id);",
+              "",
+              "pm.environment.set(\"jobIds\", JSON.stringify(ids));",
+              "pm.environment.set(\"jobIndex\", 0);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -50,21 +66,54 @@
           "raw": "{\n  \"query\": \"{ jobs { id name scheduleType status } }\"\n}\n"
         },
         "url": {
-          "raw": "http://localhost:8080/graphql",
-          "protocol": "http",
+          "raw": "{{baseURL}}/graphql",
           "host": [
-            "localhost"
+            "{{baseURL}}"
           ],
-          "port": "8080",
           "path": [
             "graphql"
           ]
         }
-      }
+      },
+      "response": []
     },
     {
       "name": "Get Job By ID",
-      "id": "70a9d681-376e-474b-926c-c88e397f9d9e",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "let raw = pm.environment.get(\"jobIds\");",
+              "",
+              "if (!raw) {",
+              "    console.log(\"jobIds is missing in environment.\");",
+              "    throw new Error(\"jobIds not found.\");",
+              "}",
+              "",
+              "let ids = JSON.parse(raw);",
+              "let index = Number(pm.environment.get(\"jobIndex\") || 0);",
+              "",
+              "// Stop if index > length",
+              "if (index >= ids.length) {",
+              "    console.log(\"No more IDs to process.\");",
+              "    index = 0;",
+              "    pm.environment.set(\"jobIndex\", 0);",
+              "}",
+              "",
+              "let currentId = ids[index];",
+              "pm.environment.set(\"currentJobId\", currentId);",
+              "pm.environment.set(\"jobIndex\", index + 1);",
+              "",
+              "console.log(\"Using ID:\", currentId);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -75,24 +124,68 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"query\": \"query($id: ID!) { job(id: $id) { id name status scheduleType } }\",\n  \"variables\": { \"id\": \"fdbea74b-2230-4690-8f38-5f06db15e205\" }\n}\n"
+          "raw": "{\n  \"query\": \"query($id: ID!) { job(id: $id) { id name status scheduleType } }\",\n  \"variables\": { \"id\": \"{{currentJobId}}\" }\n}\n"
         },
         "url": {
-          "raw": "http://localhost:8080/graphql",
-          "protocol": "http",
+          "raw": "{{baseURL}}/graphql",
           "host": [
-            "localhost"
+            "{{baseURL}}"
           ],
-          "port": "8080",
           "path": [
             "graphql"
           ]
         }
-      }
+      },
+      "response": []
     },
     {
       "name": "Pause Job By ID",
-      "id": "d8fc5031-6dff-4558-af9a-fbedaabd1f89",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "let raw = pm.environment.get(\"jobIds\");",
+              "",
+              "if (!raw) {",
+              "    console.log(\"jobIds is missing in environment.\");",
+              "    throw new Error(\"jobIds not found.\");",
+              "}",
+              "",
+              "let ids = JSON.parse(raw);",
+              "let index = Number(pm.environment.get(\"jobIndex\") || 0);",
+              "",
+              "// Stop if index > length",
+              "if (index >= ids.length) {",
+              "    console.log(\"No more IDs to process.\");",
+              "    index = 0;",
+              "    pm.environment.set(\"jobIndex\", 0);",
+              "}",
+              "",
+              "let currentId = ids[index];",
+              "pm.environment.set(\"currentJobId\", currentId);",
+              "pm.environment.set(\"jobIndex\", index + 1);",
+              "",
+              "console.log(\"Using ID:\", currentId);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -103,24 +196,57 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"query\": \"mutation($id: ID!) { pauseJob(id: $id) { id name status } }\",\n  \"variables\": { \"id\": \"e43d198c-7dba-48d4-abb1-138f19d51ca8\" }\n}\n"
+          "raw": "{\n  \"query\": \"mutation($id: ID!) { pauseJob(id: $id) { id name status } }\",\n  \"variables\": { \"id\": \"{{currentJobId}}\" }\n}\n"
         },
         "url": {
-          "raw": "http://localhost:8080/graphql",
-          "protocol": "http",
+          "raw": "{{baseURL}}/graphql",
           "host": [
-            "localhost"
+            "{{baseURL}}"
           ],
-          "port": "8080",
           "path": [
             "graphql"
           ]
         }
-      }
+      },
+      "response": []
     },
     {
       "name": "Resume Job By ID",
-      "id": "d44aaf07-857d-4af3-85c2-742e914ea541",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "let raw = pm.environment.get(\"jobIds\");",
+              "",
+              "if (!raw) {",
+              "    console.log(\"jobIds is missing in environment.\");",
+              "    throw new Error(\"jobIds not found.\");",
+              "}",
+              "",
+              "let ids = JSON.parse(raw);",
+              "let index = Number(pm.environment.get(\"jobIndex\") || 0);",
+              "",
+              "// Stop if index > length",
+              "if (index >= ids.length) {",
+              "    console.log(\"No more IDs to process.\");",
+              "    index = 0;",
+              "    pm.environment.set(\"jobIndex\", 0);",
+              "}",
+              "",
+              "let currentId = ids[index];",
+              "pm.environment.set(\"currentJobId\", currentId);",
+              "pm.environment.set(\"jobIndex\", index + 1);",
+              "",
+              "console.log(\"Using ID:\", currentId);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -131,24 +257,57 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"query\": \"mutation($id: ID!) { resumeJob(id: $id) { id name status } }\",\n  \"variables\": { \"id\": \"fdbea74b-2230-4690-8f38-5f06db15e205\" }\n}\n"
+          "raw": "{\n  \"query\": \"mutation($id: ID!) { resumeJob(id: $id) { id name status } }\",\n  \"variables\": { \"id\": \"{{currentJobId}}\" }\n}\n"
         },
         "url": {
-          "raw": "http://localhost:8080/graphql",
-          "protocol": "http",
+          "raw": "{{baseURL}}/graphql",
           "host": [
-            "localhost"
+            "{{baseURL}}"
           ],
-          "port": "8080",
           "path": [
             "graphql"
           ]
         }
-      }
+      },
+      "response": []
     },
     {
       "name": "Run Job Now",
-      "id": "004b8f43-3154-412a-95d8-af318af9f378",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "let raw = pm.environment.get(\"jobIds\");",
+              "",
+              "if (!raw) {",
+              "    console.log(\"jobIds is missing in environment.\");",
+              "    throw new Error(\"jobIds not found.\");",
+              "}",
+              "",
+              "let ids = JSON.parse(raw);",
+              "let index = Number(pm.environment.get(\"jobIndex\") || 0);",
+              "",
+              "// Stop if index > length",
+              "if (index >= ids.length) {",
+              "    console.log(\"No more IDs to process.\");",
+              "    index = 0;",
+              "    pm.environment.set(\"jobIndex\", 0);",
+              "}",
+              "",
+              "let currentId = ids[index];",
+              "pm.environment.set(\"currentJobId\", currentId);",
+              "pm.environment.set(\"jobIndex\", index + 1);",
+              "",
+              "console.log(\"Using ID:\", currentId);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -159,24 +318,22 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"query\": \"mutation($id: ID!) { runJobNow(id: $id) }\",\n  \"variables\": { \"id\": \"e43d198c-7dba-48d4-abb1-138f19d51ca8\" }\n}\n"
+          "raw": "{\n  \"query\": \"mutation($id: ID!) { runJobNow(id: $id) }\",\n  \"variables\": { \"id\": \"{{currentJobId}}\" }\n}\n"
         },
         "url": {
-          "raw": "http://localhost:8080/graphql",
-          "protocol": "http",
+          "raw": "{{baseURL}}/graphql",
           "host": [
-            "localhost"
+            "{{baseURL}}"
           ],
-          "port": "8080",
           "path": [
             "graphql"
           ]
         }
-      }
+      },
+      "response": []
     },
     {
       "name": "Get Job Logs",
-      "id": "ffc9656c-5ea8-4867-b7d8-0588035ae6c2",
       "request": {
         "method": "POST",
         "header": [
@@ -190,21 +347,54 @@
           "raw": "{\n  \"query\": \"query($id: ID!) { jobLogs(jobId: $id) { id fireTime status errorMessage } }\",\n  \"variables\": { \"id\": \"e43d198c-7dba-48d4-abb1-138f19d51ca8\" }\n}\n"
         },
         "url": {
-          "raw": "http://localhost:8080/graphql",
-          "protocol": "http",
+          "raw": "{{baseURL}}/graphql",
           "host": [
-            "localhost"
+            "{{baseURL}}"
           ],
-          "port": "8080",
           "path": [
             "graphql"
           ]
         }
-      }
+      },
+      "response": []
     },
     {
       "name": "Delete Job By ID",
-      "id": "f08b71f9-70a9-405c-8732-ca0d91d13793",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "let raw = pm.environment.get(\"jobIds\");",
+              "",
+              "if (!raw) {",
+              "    console.log(\"jobIds is missing in environment.\");",
+              "    throw new Error(\"jobIds not found.\");",
+              "}",
+              "",
+              "let ids = JSON.parse(raw);",
+              "let index = Number(pm.environment.get(\"jobIndex\") || 0);",
+              "",
+              "// Stop if index > length",
+              "if (index >= ids.length) {",
+              "    console.log(\"No more IDs to process.\");",
+              "    index = 0;",
+              "    pm.environment.set(\"jobIndex\", 0);",
+              "}",
+              "",
+              "let currentId = ids[index];",
+              "pm.environment.set(\"currentJobId\", currentId);",
+              "pm.environment.set(\"jobIndex\", index + 1);",
+              "",
+              "console.log(\"Using ID:\", currentId);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -215,20 +405,27 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"query\": \"mutation($id: ID!) { deleteJob(id: $id) }\",\n  \"variables\": { \"id\": \"143bd991-dd72-4886-a0c4-552d0646d0b0\" }\n}\n"
+          "raw": "{\n  \"query\": \"mutation($id: ID!) { deleteJob(id: $id) }\",\n  \"variables\": { \"id\": \"{{currentJobId}}\" }\n}\n"
         },
         "url": {
-          "raw": "http://localhost:8080/graphql",
-          "protocol": "http",
+          "raw": "{{baseURL}}/graphql",
           "host": [
-            "localhost"
+            "{{baseURL}}"
           ],
-          "port": "8080",
           "path": [
             "graphql"
           ]
-        }
-      }
+        },
+        "description": "This request performs a GraphQL mutation to delete a job by its unique ID. \n\n- **Variable Required:** `id` (ID of the job to delete)\n- **Mutation Structure:**\n  ```graphql\n  mutation($id: ID!) {\n    deleteJob(id: $id) {\n      id\n      name\n      status\n    }\n  }\n  ```\n- **Usage Notes:**\n  - The `id` variable must be provided in the request body under `variables`.\n  - The response will include details of the deleted job if successful.\n  - Ensure you have the necessary permissions to delete jobs.\n\nUse this request to remove jobs from the system by specifying their unique identifier."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "",
+      "type": "default"
     }
   ]
 }
