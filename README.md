@@ -106,7 +106,7 @@ scheduler-instance/
 │   └── config/                                 # Spring configuration
 ├── src/main/resources/
 │   ├── application.yml                         # Spring Boot config
-│   ├── graphql/jobs.graphqls                  # GraphQL schema
+│   ├── graphql/jobs.graphqls                   # GraphQL schema
 │   └── db/migration/                           # Flyway migrations
 └── pom.xml                                     # Maven dependencies
 ```
