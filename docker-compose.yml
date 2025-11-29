@@ -67,6 +67,7 @@ services:
   # --------------------------------------------------------------
   eureka2nginx:
     build: ./infra/eureka2nginx
+    container_name: eureka_to_nginx_reconciler
     environment:
       - EUREKA_SERVER_URL=http://eureka:8761/eureka/apps/
       - POLL_INTERVAL=10
