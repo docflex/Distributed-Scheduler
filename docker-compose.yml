@@ -100,20 +100,20 @@ services:
 
 
   # --------------------------------------------------------------
-  # UI for Scheduler (pgAdmin)
+  # UI for Scheduler (Need to be Fixed)
   # --------------------------------------------------------------
-  ui:
-    build: ./distributed-scheduler-ui
-    container_name: scheduler_ui
-    ports:
-      - "8080:80"     # serve UI on localhost:8080
-    networks:
-      - distributed_scheduler
-    environment:
-      - VITE_API_BASE_URL=http://nginx/scheduler-instance/graphql
-    depends_on:
-      - scheduler-instance
-      - eureka
+#  ui:
+#    build: ./distributed-scheduler-ui
+#    container_name: scheduler_ui
+#    ports:
+#      - "8080:80"     # serve UI on localhost:8080
+#    networks:
+#      - distributed_scheduler
+#    environment:
+#      - VITE_API_BASE_URL=http://nginx/scheduler-instance/graphql
+#    depends_on:
+#      - scheduler-instance
+#      - eureka
 
 
 volumes:
