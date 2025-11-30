@@ -1,3 +1,7 @@
+<div align="center">
+  <img width="700" alt="Banner Distributed Scheduler" src="https://github.com/user-attachments/assets/c4269912-d81f-4241-afea-ffcadd665e5d" />
+</div>   
+
 # Distributed Scheduler
 
 A production-ready, cloud-native distributed scheduling system built with **Spring Boot 3**, **Quartz**, and **PostgreSQL**.
@@ -497,11 +501,11 @@ org.quartz.threadPool.threadCount: 10                # Job execution threads
 - Postman collection for API testing
 - Health checks and auto-recovery
 
-### Phase 5: UI Dashboard (Future)
+### Phase 5: UI Dashboard [COMPLETE]
 - Real-time job monitoring
 - Visual job creation/editing forms
 - Execution timeline
-- Node status dashboard
+- Node status dashboard :(
 
 ---
 
