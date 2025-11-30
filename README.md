@@ -62,7 +62,7 @@ It includes dynamic form fields, a JSON payload editor, and validation.
 
 ---
 
-### 🔵 Execution Logs Screen
+### Execution Logs Screen
 
 Displays execution history for a job including:
 
@@ -83,13 +83,13 @@ Traditional in-memory schedulers fail in distributed environments:
 
 | Problem | @Scheduled | Distributed Scheduler |
 |---------|-----------|----------------------|
-| **Execution Count** | Runs on every node (duplicates) | ✅ Exactly-once execution |
-| **Job Persistence** | Lost on restart | ✅ Persisted to database |
-| **Dynamic Management** | Can't add/remove jobs at runtime | ✅ Full GraphQL API |
-| **Execution History** | No audit trail | ✅ Complete execution logs |
-| **Cluster Awareness** | No consensus mechanism | ✅ DB-backed distributed locking |
-| **Scalability** | Not designed for clusters | ✅ Horizontally scalable |
-| **Observability** | Limited visibility | ✅ Query job status & history |
+| **Execution Count** | Runs on every node (duplicates) | Exactly-once execution |
+| **Job Persistence** | Lost on restart | Persisted to database |
+| **Dynamic Management** | Can't add/remove jobs at runtime | Full GraphQL API |
+| **Execution History** | No audit trail | Complete execution logs |
+| **Cluster Awareness** | No consensus mechanism | DB-backed distributed locking |
+| **Scalability** | Not designed for clusters | Horizontally scalable |
+| **Observability** | Limited visibility | Query job status & history |
 
 ---
 
