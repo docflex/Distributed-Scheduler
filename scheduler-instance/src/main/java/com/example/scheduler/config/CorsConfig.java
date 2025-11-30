@@ -8,9 +8,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Set;
 
 @Component
 public class CorsConfig extends OncePerRequestFilter {
+
+    private static final Set<String> ALLOWED_ORIGINS = Set.of(
+            "http://localhost:5173", // Vite dev
+            "http://localhost:8080"  // Docker UI
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -18,15 +24,19 @@ public class CorsConfig extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+        String origin = request.getHeader("Origin");
+
+        if (origin != null && ALLOWED_ORIGINS.contains(origin)) {
+            response.setHeader("Access-Control-Allow-Origin", origin);
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+        }
+
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "*");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
 
-        // Preflight?
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
-            return; // do NOT continue filter chain
+            return;
         }
 
         filterChain.doFilter(request, response);
