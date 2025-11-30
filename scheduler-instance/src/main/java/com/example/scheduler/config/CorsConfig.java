@@ -18,23 +18,15 @@ public class CorsConfig extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String origin = request.getHeader("Origin");
-
-        if (origin != null &&
-                (origin.equals("http://localhost:5173") ||
-                        origin.equals("http://localhost:8080"))) {
-
-            response.setHeader("Access-Control-Allow-Origin", origin);
-            response.setHeader("Access-Control-Allow-Credentials", "true");
-        }
-
-        response.setHeader("Vary", "Origin");
-        response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "*");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
 
+        // Preflight?
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            response.setStatus(200);
-            return;
+            response.setStatus(HttpServletResponse.SC_OK);
+            return; // do NOT continue filter chain
         }
 
         filterChain.doFilter(request, response);
