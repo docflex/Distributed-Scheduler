@@ -1,0 +1,14 @@
+FROM node:18 AS build
+WORKDIR /app
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
+COPY . .
+RUN npm install
+RUN npm run build
+
+
+FROM nginx:1.25
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
