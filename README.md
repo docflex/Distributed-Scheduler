@@ -75,7 +75,7 @@ Displays execution history for a job including:
 <img width="1440" height="345" alt="Screenshot 2025-11-30 at 12 40 51 PM" src="https://github.com/user-attachments/assets/07ae8eab-f760-4555-bdf6-7f157723529a" />
 
 
---
+---
 
 ## Why Not Spring's @Scheduled?
 
