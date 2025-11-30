@@ -106,17 +106,17 @@ services:
     build:
       context: ./distributed-scheduler-ui
       args:
-        - VITE_API_BASE_URL=http://localhost/scheduler-instance/graphql
+        - VITE_API_BASE_URL=/api/graphql
     container_name: scheduler_ui
     ports:
       - "8080:80"
     networks:
       - distributed_scheduler
     environment:
-      - VITE_API_BASE_URL=http://localhost/scheduler-instance/graphql
+      - VITE_API_BASE_URL=/api/graphql
     depends_on:
-      - scheduler-instance
       - nginx
+      - scheduler-instance
 
 
 volumes:
