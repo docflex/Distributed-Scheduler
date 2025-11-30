@@ -21,8 +21,63 @@ Core Features
 - **Horizontally Scalable**: Add or remove scheduler instances without code changes or downtime
 
 ---
+## UI Dashboard
 
-Why Not Spring's @Scheduled?
+The project includes a fully interactive **web UI dashboard** built using:
+
+* **React + Vite**
+* **Apollo GraphQL**
+* **React Query**
+* **TailwindCSS + ShadCN UI**
+* **NGINX static hosting**
+* **Docker Compose deployment**
+
+The UI provides complete visibility and control over the distributed scheduler cluster.
+
+---
+
+### Job List
+
+Shows all scheduled jobs with real-time status, schedule type, timestamps, and actions (Run Now, Pause, Resume, Delete, View Logs).
+
+**Screenshot:**
+
+<img width="1440" height="447" alt="Screenshot 2025-11-30 at 12 39 30 PM" src="https://github.com/user-attachments/assets/2d536a67-402a-429f-ac13-cf71132251ba" />
+
+---
+
+### Create Job
+
+Supports all schedule types:
+
+* CRON
+* FIXED_RATE
+* FIXED_DELAY
+
+It includes dynamic form fields, a JSON payload editor, and validation.
+
+**Screenshot:**
+
+<img width="1440" height="496" alt="Screenshot 2025-11-30 at 12 35 22 PM" src="https://github.com/user-attachments/assets/5d3a492f-cf67-4a36-8f58-3ce40f9ffbe2" />
+
+---
+
+### 🔵 Execution Logs Screen
+
+Displays execution history for a job including:
+
+* Fire time
+* Status (SUCCESS / FAILED)
+* Error message (if any)
+
+**Screenshot:**
+
+<img width="1440" height="345" alt="Screenshot 2025-11-30 at 12 40 51 PM" src="https://github.com/user-attachments/assets/07ae8eab-f760-4555-bdf6-7f157723529a" />
+
+
+--
+
+## Why Not Spring's @Scheduled?
 
 Traditional in-memory schedulers fail in distributed environments:
 
